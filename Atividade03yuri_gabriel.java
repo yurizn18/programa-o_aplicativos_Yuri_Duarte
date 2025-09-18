@@ -179,7 +179,7 @@ public class Atividade03yuri_gabriel {
       //  System.out.print("Valor de f"+f);
             //System.out.print("Valor de f"+f1);
                   
-         
+         //13
          //double m,b,x1,x2,y1,y2,A;
         
         //System.out.print("Valor de m:");
@@ -233,3 +233,4 @@ public class Atividade03yuri_gabriel {
     }
     
 }
+
