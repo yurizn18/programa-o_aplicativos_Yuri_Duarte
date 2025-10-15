@@ -1,0 +1,207 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+package caixa_rapido_refatorado_yuri_duarte;
+import java.util.Scanner;
+import java.util.Random;
+
+/**
+ *
+ * @author Aluno
+ */
+public class Caixa_rapido_refatorado_yuri_duarte {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+    ContaBancaria conta = new ContaBancaria(100.0, 0.0);
+    ServicoCambio cambio = new ServicoCambio(5.32);
+    ExtratoBancario extrato = new ExtratoBancario(10);
+    SimuladorEmprestimo simulador = new SimuladorEmprestimo(0.02);
+
+    Scanner entrada = new Scanner(System.in);
+    Random random = new Random();
+
+    int opcao = -1;
+    double emprestimo;
+    double salario_bruto;
+    int p = 0;  // parcelas
+    int numero_aleatorio = 0;
+    String voltar = "";
+
+    do {
+        System.out.println("-------Menu Bancario----");
+        System.out.println("1-Saldo");
+        System.out.println("2-Deposito");
+        System.out.println("3-Extrato");
+        System.out.println("4-Simular Emprestimo");
+        System.out.println("5-Comprar Dolar");
+        System.out.println("0-Sair");
+
+        System.out.print("Escolha uma opcao: ");
+        if (!entrada.hasNextInt()) {
+            System.out.println("Opção inválida.");
+            entrada.nextLine();  // limpar buffer
+            continue;
+        }
+        opcao = entrada.nextInt();
+        entrada.nextLine(); // limpar buffer
+
+        switch (opcao) {
+            case 1:
+                conta.exibirsaldo();
+                System.out.print("Deseja voltar ao menu (V) ou encerrar o programa (E)? ");
+                voltar = entrada.nextLine().trim().toUpperCase();
+                if (voltar.equals("E")) {
+                    opcao = 0;
+                }
+                break;
+
+            case 2:
+                System.out.print("Digite o valor do depósito: ");
+                if (!entrada.hasNextDouble()) {
+                    System.out.println("Valor inválido.");
+                    entrada.nextLine();
+                    break;
+                }
+                double deposito = entrada.nextDouble();
+                entrada.nextLine();
+
+                if (deposito >= 0 && deposito < 5000.00) {
+                    conta.depositar(deposito);
+                    extrato.registrar("DEPÓSITO (+)", deposito);
+                    System.out.println("Depósito realizado com sucesso.");
+                    conta.exibirsaldo();
+                } else {
+                    System.out.println("Valor inválido para depósito.");
+                }
+
+                System.out.print("Deseja voltar ao menu (V) ou encerrar o programa (E)? ");
+                voltar = entrada.nextLine().trim().toUpperCase();
+                if (voltar.equals("E")) {
+                    opcao = 0;
+                }
+                break;
+
+            case 3:
+                System.out.println("===== EXTRATO BANCÁRIO =====");
+                if (extrato.vazio()) {
+                    System.out.println("Nenhum extrato disponível.");
+                } else {
+                    extrato.imprimir();
+                }
+                System.out.print("Deseja voltar ao menu (V) ou encerrar o programa (E)? ");
+                voltar = entrada.nextLine().trim().toUpperCase();
+                if (voltar.equals("E")) {
+                    opcao = 0;
+                }
+                break;
+
+            case 4:
+                System.out.print("\nInforme o valor do empréstimo (R$): R$");
+                emprestimo = entrada.nextDouble();
+
+                while (emprestimo < 200.00 || emprestimo > 100000.00) {
+                    System.out.println("O valor do empréstimo deve ser maior que R$200,00 e menor que R$100.000,00.");
+                    System.out.print("Informe o valor do empréstimo (R$): R$");
+                    emprestimo = entrada.nextDouble();
+                }
+
+                System.out.print("Informe o seu salário bruto (R$): R$");
+                salario_bruto = entrada.nextDouble();
+
+                while (salario_bruto <= 0) {
+                    System.out.print("Valor inválido. Insira um valor maior que R$0,00: ");
+                    salario_bruto = entrada.nextDouble();
+                }
+                entrada.nextLine(); 
+
+                do {
+                    System.out.print("Quantidade de parcelas (6, 12, 18, 24, 30, 36, 40, 48, 56, 60 ou 72): ");
+                    while (!entrada.hasNextInt()) {
+                        System.out.println("Entrada inválida. Digite um número inteiro.");
+                        entrada.next();
+                    }
+                    p = entrada.nextInt();
+                    entrada.nextLine();
+
+                    if (!simulador.numeroParcelas(p)) {
+                        System.out.println("Número de parcelas inválido.");
+                    }
+                } while (!simulador.numeroParcelas(p));
+
+                System.out.printf("\nValor da parcela: R$ %.2f%n", simulador.valorParcela(emprestimo, p));
+                System.out.printf("Valor do empréstimo: R$ %.2f%n", emprestimo);
+                System.out.printf("Valor total do empréstimo a ser pago: R$ %.2f%n", simulador.total_com_juros(emprestimo));
+
+                if (simulador.valorParcela(emprestimo, p) <= 0.30 * salario_bruto) {
+                    numero_aleatorio = random.nextInt(100000);
+                    System.out.println("\nEmpréstimo disponível!");
+                    System.out.println("Entre em contato com a central e informe o número de protocolo EM" + numero_aleatorio);
+                    System.out.print("Deseja voltar ao menu (V) ou encerrar o programa (E)? ");
+                    voltar = entrada.nextLine().toUpperCase();
+
+                    if (voltar.equals("E")) {
+                        opcao = 0;
+                    }
+                } else {
+                    System.out.printf("Empréstimo indisponível! O valor da parcela não pode ultrapassar o valor de R$ %.2f.%n", 0.3 * salario_bruto);
+                }
+                break;
+
+            case 5:
+                System.out.printf("Saldo disponível em Reais: R$ %.2f%n", conta.getsaldoReais());
+                System.out.print("Quantos dólares deseja comprar (US$)? ");
+                if (!entrada.hasNextDouble()) {
+                    System.out.println("Valor inválido.");
+                    entrada.nextLine();
+                    break;
+                }
+                double dolarComprar = entrada.nextDouble();
+                entrada.nextLine();
+
+                double custoEmReais = cambio.custoEmReais(dolarComprar);
+                System.out.printf("Custo em Reais: R$ %.2f%n", custoEmReais);
+
+                if (custoEmReais > conta.getsaldoReais()) {
+                    System.out.println("Seu saldo atual é insuficiente.");
+                    System.out.print("Deseja simular novamente (R), voltar ao menu (V) ou encerrar o programa (E)? ");
+                    String escolha = entrada.nextLine().trim().toUpperCase();
+                    if (escolha.equals("E")) {
+                        opcao = 0;
+                    }
+                } else {
+                    System.out.print("Confirmar compra? ('s' para confirmar, 'n' para cancelar): ");
+                    String confirma = entrada.nextLine().trim().toLowerCase();
+
+                    if (confirma.equals("s")) {
+                        conta.comprarDolar(dolarComprar, cambio);
+                        extrato.registrar("COMPRA DE DÓLARES (-)", -custoEmReais);
+                        System.out.println("Compra realizada com sucesso!");
+                        conta.exibirsaldo();
+                    } else {
+                        System.out.println("Compra cancelada.");
+                    }
+
+                    System.out.print("Deseja voltar ao menu (V) ou encerrar o programa (E)? ");
+                    voltar = entrada.nextLine().trim().toUpperCase();
+                    if (voltar.equals("E")) {
+                        opcao = 0;
+                    }
+                }
+                break;
+
+            case 0:
+                System.out.println("Encerrando o atendimento. Obrigado por usar o caixa rápido dos irmãos Y&G.");
+                break;
+
+            default:
+                System.out.println("Opção inválida.");
+        }
+
+    } while (opcao != 0);
+
+}
+}
