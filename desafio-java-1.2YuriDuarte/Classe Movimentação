@@ -1,0 +1,22 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package caixa_rapido_refatorado_yuri_duarte;
+
+/**
+ *
+ * @author Aluno
+ */
+public class Movimentacao {
+    String texto;
+    double valor;
+    public Movimentacao( String texto,double valor){
+        this.texto=texto;
+        this.valor=valor;
+    }
+    public void mostrar(){
+        System.out.printf("%s: R$ %.2f\n", texto, valor);
+    }
+}
+
