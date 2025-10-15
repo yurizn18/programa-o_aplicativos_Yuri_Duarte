@@ -1,0 +1,46 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package caixa_rapido_refatorado_yuri_duarte;
+
+/**
+ *
+ * @author Aluno
+ */
+public class ExtratoBancario {
+      Movimentacao[] movimentacoes;
+    int indice = 0;
+
+    public ExtratoBancario(int tamanho) {
+        movimentacoes = new Movimentacao[tamanho];
+    }
+
+    public void registrar(String texto, double valor) {
+        if (indice < movimentacoes.length) {
+            movimentacoes[indice] = new Movimentacao(texto, valor);
+            indice++;
+        } else {
+            for (int i = 1; i < movimentacoes.length; i++) {
+                movimentacoes[i - 1] = movimentacoes[i];
+            }
+            movimentacoes[movimentacoes.length - 1] = new Movimentacao(texto, valor);
+        }
+    }
+
+    public boolean vazio() {
+        return indice == 0;
+    }
+
+    public void imprimir() {
+        if (indice == 0) {
+            System.out.println("Nenhuma movimentação registrada.");
+        } else {
+            System.out.println("===== EXTRATO BANCÁRIO =====");
+            for (int i = 0; i < indice; i++) {
+                movimentacoes[i].mostrar();
+            }
+        }
+    }
+}
+
