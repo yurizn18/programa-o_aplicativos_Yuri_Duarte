@@ -1,0 +1,42 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package caixa_rapido_refatorado_yuri_duarte;
+
+/**
+ *
+ * @author Aluno
+ */
+public class ContaBancaria {
+    double saldoReais;
+    double saldoDolares;
+
+    public ContaBancaria(double saldoReais, double saldoDolares) {
+        this.saldoReais = saldoReais;
+        this.saldoDolares = saldoDolares;
+    }
+
+    public void depositar(double valor) {
+        this.saldoReais += valor;
+    }
+
+    public void comprarDolar(double qtdUsd, ServicoCambio cambio) {
+        double custo = cambio.custoEmReais(qtdUsd);
+        this.saldoDolares += qtdUsd;
+        this.saldoReais -= custo;
+    }
+
+    public void exibirsaldo() {
+        System.out.printf("Saldo atual em Reais: R$ %.2f%n", saldoReais);
+        System.out.printf("Saldo atual em Dólares: US$ %.2f%n", saldoDolares);
+    }
+
+    public double getsaldoReais() {
+        return saldoReais;
+    }
+
+    public double getsaldoDolares() {
+        return saldoDolares;
+    }
+}
