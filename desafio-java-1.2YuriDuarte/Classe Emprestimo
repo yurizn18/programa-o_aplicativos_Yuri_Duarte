@@ -1,0 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package caixa_rapido_refatorado_yuri_duarte;
+
+/**
+ *
+ * @author Aluno
+ */
+public class SimuladorEmprestimo {
+        double juros;
+    public SimuladorEmprestimo (double juros) {
+        this.juros=juros;
+    }
+    public double total_com_juros(double valor){
+        return valor *(1+juros);
+    }
+    public double valorParcela(double valor, int parcelas){
+        double total= total_com_juros(valor);
+        return total/parcelas;
+    }
+    
+   public boolean numeroParcelas(int parcelas) {
+    int[] parcelasPermitidas = {6, 12, 18, 24, 30, 36, 40, 48, 56, 60, 72};
+
+    for (int p : parcelasPermitidas) {
+        if (p == parcelas) {
+            return true;
+        }
+    }
+
+    return false;
+}
+}
