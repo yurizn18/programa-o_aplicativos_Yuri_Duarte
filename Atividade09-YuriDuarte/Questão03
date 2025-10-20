@@ -1,0 +1,108 @@
+
+public class JavaApplication12 {
+
+ 
+   
+    public static void main(String[] args) {
+Scanner entrada = new Scanner(System.in);
+
+    Tarefa[] tarefas = new Tarefa[10];
+    int qtd_Tarefas = 0, opcao;
+    String descricao;
+
+    do {
+        System.out.println("\nLISTA DE TAREFAS TO-DO\n");
+        System.out.println("1- Adicionar tarefa");
+        System.out.println("2- Listar tarefas");     
+        System.out.println("3- Concluir tarefa");
+        System.out.println("4- Sair");
+        System.out.print("Opção: ");
+        opcao = entrada.nextInt();
+        entrada.nextLine(); 
+
+        switch (opcao) {
+            case 1:  
+                if (qtd_Tarefas < tarefas.length) {
+                    System.out.print("Descreva a tarefa: ");
+                    descricao = entrada.nextLine();
+                    tarefas[qtd_Tarefas] = new Tarefa(qtd_Tarefas + 1, descricao);
+                    System.out.println("Tarefa adicionada!");
+                    qtd_Tarefas++;
+                } else {
+                    System.out.println("A lista esta cheia!");
+                }
+                break;
+
+            case 2:  
+                System.out.println("\n=== LISTA DAS TAREFAS ===");
+                for (int i = 0; i < qtd_Tarefas; i++) {
+                    tarefas[i].exibir();
+                }
+                break;
+
+            case 3:  
+                System.out.print("Qual ID da tarefa ? ");
+                int id = entrada.nextInt();
+                boolean tarefaencontrada = false;
+
+                for (int i = 0; i < qtd_Tarefas; i++) {
+                    if (tarefas[i].getId() == id) {
+                        tarefas[i].setConcluida(true);
+                        System.out.println("Tarefa concluída!");
+                        tarefaencontrada = true;
+                        break;
+                    }
+                }
+
+                if (!tarefaencontrada) {
+                    System.out.println("Tarefa não encontrada!");
+                }
+                break;
+
+            case 4:
+                System.out.println("Saindo...");
+                break;
+
+            default:
+                System.out.println("Opção inválida!");
+        }
+
+    } while (opcao != 4);
+}
+}
+    
+    
+
+public class Tarefa {
+private int id;
+private String descricao;
+private boolean concluida;
+
+    public Tarefa(int id, String descricao) {
+        this.id = id;
+        this.descricao = descricao;
+        this.concluida = false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public boolean isConcluida() {
+        return concluida;
+    }
+
+    public void setConcluida(boolean concluida) {
+        this.concluida = concluida;
+    }
+
+    public void exibir() {
+        String status = concluida ? "CONCLUÍDA" : "PENDENTE";
+        System.out.println("[" + id + "] " + descricao + " - " + status);
+    }
+}
+
