@@ -1,0 +1,238 @@
+
+public class Att9292 {
+
+    public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        SistemaNotas sistema = new SistemaNotas();
+        int opcao = 0;
+        boolean valido;
+
+        do {
+            System.out.println("\n=== SISTEMA DE NOTAS ===");
+            System.out.println("1 - Definir avaliações");
+            System.out.println("2 - Lançar notas dos alunos");
+            System.out.println("3 - Gerar boletim");
+            System.out.println("4 - Sair");
+
+            valido = false; 
+
+            while (!valido) {
+                try {
+                    System.out.print("Opção: ");
+                    opcao = entrada.nextInt();
+                    entrada.nextLine();
+                    valido = true; 
+                } catch (InputMismatchException e) {
+                    System.out.println("️ Entrada inválida! Digite um número inteiro.");
+                    entrada.nextLine();
+                }
+            }
+
+            switch (opcao) {
+                case 1 -> sistema.definirAvaliacoes(entrada);
+                case 2 -> sistema.lancarNotas(entrada);
+                case 3 -> sistema.gerarBoletim();
+                case 4 -> System.out.println("Saindo...");
+                default -> System.out.println(" Opção inválida!");
+            }
+
+        } while (opcao != 4);
+    }
+}
+
+
+  
+
+public class Aluno {
+   
+    private String codigo;
+    private String nome;
+    private double notaFinal;
+    private String situacao;
+
+    public Aluno(String codigo, String nome) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.notaFinal = 0.0;
+        this.situacao = "Sem notas";
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double getNotaFinal() {
+        return notaFinal;
+    }
+
+    public String getSituacao() {
+        return situacao;
+    }
+
+    public void setNotaFinal(double notaFinal) {
+        this.notaFinal = notaFinal;
+        definirSituacao();
+    }
+
+    private void definirSituacao() {
+        if (notaFinal < 45)
+            situacao = "Reprovado";
+        else if (notaFinal < 60)
+            situacao = "Recuperação";
+        else
+            situacao = "Aprovado";
+    }
+}
+
+
+
+
+package att9292;
+
+
+public class Avaliacao {
+    private String nome;
+    private double pontuacaoMaxima;
+
+    public Avaliacao(String nome, double pontuacaoMaxima) {
+        this.nome = nome;
+        this.pontuacaoMaxima = pontuacaoMaxima;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public double getPontuacaoMaxima() {
+        return pontuacaoMaxima;
+    }
+}
+
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package att9292;
+import java.util.*;
+/**
+ *
+ * @author GABRIEL
+ */
+public class SistemaNotas {
+   
+    private List<Avaliacao> avaliacoes = new ArrayList<>();
+    private List<Aluno> alunos = new ArrayList<>();
+    private Map<String, Map<String, Double>> notas = new HashMap<>();
+
+    public SistemaNotas() {
+        // Cadastro fixo dos alunos
+        alunos.add(new Aluno("0101", "Ana Beatriz Costa"));
+        alunos.add(new Aluno("0102", "João Vitor Monteiro Cardoso"));
+        alunos.add(new Aluno("0103", "Bruno Gomes Ferreira"));
+        alunos.add(new Aluno("0104", "Carla Dias Almeida"));
+        alunos.add(new Aluno("0105", "Daniel Martins Pereira"));
+        alunos.add(new Aluno("0106", "Eduarda Lima Rocha"));
+        alunos.add(new Aluno("0107", "Felipe Azevedo Barbosa"));
+        alunos.add(new Aluno("0108", "Gabriela Castro Souza"));
+        alunos.add(new Aluno("0109", "Heitor Nogueira Pinto"));
+        alunos.add(new Aluno("0110", "Isabela Ribeiro Campos"));
+    }
+
+    public void definirAvaliacoes(Scanner sc) {
+        while (true) {
+            avaliacoes.clear();
+            System.out.print("Quantas avaliações? ");
+            int qtd = sc.nextInt();
+            sc.nextLine();
+
+            double total = 0;
+            for (int i = 1; i <= qtd; i++) {
+                System.out.print("Nome da avaliação " + i + ": ");
+                String nome = sc.nextLine().trim();
+                System.out.print("Pontuação máxima (ex: 20): ");
+                double pontos = sc.nextDouble();
+                sc.nextLine();
+
+                total += pontos;
+                avaliacoes.add(new Avaliacao(nome, pontos));
+            }
+
+            if (total > 100) {
+                System.out.println(" Total excede 100 pontos (" + total + "). Corrija!");
+            } else if (total < 100) {
+                System.out.println(" Total é menor que 100 pontos (" + total + "). Corrija!");
+            } else {
+                System.out.println("Esquema salvo com sucesso. Total definido: " + total + " pontos.");
+                break;
+            }
+        }
+    }
+
+    public void lancarNotas(Scanner sc) {
+        if (avaliacoes.isEmpty()) {
+            System.out.println(" Nenhuma avaliação definida!");
+            return;
+        }
+
+        for (Aluno a : alunos) {
+            System.out.println("\nAluno " + a.getCodigo() + " | " + a.getNome());
+            Map<String, Double> notasAluno = new HashMap<>();
+
+            for (Avaliacao av : avaliacoes) {
+                double nota;
+                do {
+                    System.out.print(av.getNome() + " (0–" + av.getPontuacaoMaxima() + "): ");
+                    while (!sc.hasNextDouble()) {
+                        System.out.print("Entrada inválida! Digite um número: ");
+                        sc.next();
+                    }
+                    nota = sc.nextDouble();
+                    sc.nextLine();
+
+                    if (nota < 0 || nota > av.getPontuacaoMaxima()) {
+                        System.out.println("️ Valor fora do limite permitido!");
+                    }
+                } while (nota < 0 || nota > av.getPontuacaoMaxima());
+
+                notasAluno.put(av.getNome(), nota);
+            }
+
+            notas.put(a.getCodigo(), notasAluno);
+            System.out.println("Notas salvas!");
+        }
+    }
+
+    public void gerarBoletim() {
+        if (notas.isEmpty()) {
+            System.out.println("Nenhuma nota lançada!");
+            return;
+        }
+
+        System.out.println("\n----------------------------------------------");
+        System.out.println("codigo | nome                         | nota_final | situação");
+        System.out.println("----------------------------------------------");
+
+        for (Aluno a : alunos) {
+            Map<String, Double> notasAluno = notas.get(a.getCodigo());
+            if (notasAluno == null) continue;
+
+            double total = 0;
+            for (Avaliacao av : avaliacoes) {
+                total += notasAluno.getOrDefault(av.getNome(), 0.0);
+            }
+
+            a.setNotaFinal(total);
+            System.out.printf("%s | %-28s | %10.2f | %s%n",
+                    a.getCodigo(), a.getNome(), a.getNotaFinal(), a.getSituacao());
+        }
+        System.out.println("----------------------------------------------");
+    }
+}
+
+
+
