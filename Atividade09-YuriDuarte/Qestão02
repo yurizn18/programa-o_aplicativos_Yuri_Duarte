@@ -1,0 +1,204 @@
+package biblioteca;
+
+import java.util.Scanner;
+
+public class Biblioteca {
+    public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        Acervos acervo = new Acervos();
+        int opcao;
+
+        do {
+            System.out.println("\n=== BIBLIOTECA ===");
+            System.out.println("1) Consultar acervo");
+            System.out.println("2) Pegar livro emprestado");
+            System.out.println("3) Sair");
+            System.out.print("Escolha: ");
+
+            while (!entrada.hasNextInt()) {
+                System.out.println("Digite um número de 1 a 3.");
+                entrada.nextLine();
+            }
+
+            opcao = entrada.nextInt();
+            entrada.nextLine();
+
+            switch (opcao) {
+                case 1 -> {
+                    acervo.mostrarLivros();
+                }
+
+                case 2 -> {
+                    System.out.println("Buscar por (1) Código ou (2) Título?");
+                    String modo = entrada.nextLine().trim();
+                    livro l = null;
+
+                    if (modo.equals("1")) {
+                        System.out.print("Digite o código: ");
+                        if (entrada.hasNextInt()) {
+                            int codigo = entrada.nextInt();
+                            entrada.nextLine();
+                            l = acervo.buscarPorCodigo(codigo);
+                        } else {
+                            System.out.println("Código inválido.");
+                            entrada.nextLine();
+                            break;
+                        }
+                    } else {
+                        System.out.print("Digite parte do título: ");
+                        String titulo = entrada.nextLine();
+                        l = acervo.buscarPorTitulo(titulo);
+                    }
+
+                    if (l == null) {
+                        System.out.println("Livro não encontrado.");
+                        break;
+                    }
+
+                    System.out.print("Informe o nome ou matrícula do leitor: ");
+                    String leitor = entrada.nextLine().trim();
+                    if (leitor.isEmpty()) {
+                        System.out.println("Leitor inválido.");
+                        break;
+                    }
+
+                    acervo.emprestarLivro(l, leitor);
+                }
+
+                case 3 -> System.out.println("Saindo... até logo!");
+
+                default -> System.out.println("Opção inválida. Digite 1, 2 ou 3.");
+            }
+
+        } while (opcao != 3);
+
+        entrada.close();
+    }
+}
+
+
+package biblioteca;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
+public class Acervos {
+    private livro[] livros;
+
+    public Acervos() {
+        livros = new livro[5];
+        livros[0] = new livro("POO EM JAVA", "SILVA A", 1605, 101, false);
+        livros[1] = new livro("ALGORITIMOS MODERNOS", "CORMEN T", 1943, 102, false);
+        livros[2] = new livro("ESTRUTURA DE DADOS ", "WEIS.M", 1949, 103, false);
+        livros[3] = new livro("A Metamorfose", "Franz Kafka", 1915, 1004, false);
+        livros[4] = new livro("Dom Casmurro", "Machado de Assis", 1899, 1005, false);
+    }
+
+    public void mostrarLivros() {
+        System.out.println("\n--- ACERVO ---");
+        for (livro l : livros) {
+            System.out.println(l);
+        }
+    }
+
+    public livro buscarPorCodigo(int codigo) {
+        for (livro l : livros) {
+            if (l.getCodigo() == codigo) return l;
+        }
+        return null;
+    }
+
+    public livro buscarPorTitulo(String titulo) {
+        String t = titulo.trim().toLowerCase();
+        for (livro l : livros) {
+            if (l.getTitulo().toLowerCase().contains(t)) return l;
+        }
+        return null;
+    }
+
+    private LocalDate addDiasUteis(LocalDate inicio, int diasUteis) {
+        LocalDate data = inicio;
+        int adicionados = 0;
+        while (adicionados < diasUteis) {
+            data = data.plusDays(1);
+            DayOfWeek dw = data.getDayOfWeek();
+            if (dw != DayOfWeek.SATURDAY && dw != DayOfWeek.SUNDAY) {
+                adicionados++;
+            }
+        }
+        return data;
+    }
+
+    public boolean emprestarLivro(livro l, String leitor) {
+        if (l == null) {
+            System.out.println("Livro não encontrado.");
+            return false;
+        }
+        if (l.isEmprestado()) {
+            System.out.println(" Livro '" + l.getTitulo() + "' já está emprestado.");
+            return false;
+        }
+
+        LocalDate hoje = LocalDate.now();
+        l.emprestar(leitor, hoje);
+        LocalDate devolucao = addDiasUteis(hoje, 7);
+
+        System.out.println("\n=== RECIBO DE EMPRÉSTIMO ===");
+        System.out.println("Leitor: " + leitor);
+        System.out.println("Livro: " + l.getTitulo());
+        System.out.println("Código: " + l.getCodigo());
+        System.out.println("Data do empréstimo: " + hoje);
+        System.out.println("Data de devolução (7 dias úteis): " + devolucao);
+        System.out.println("=============================\n");
+
+        return true;
+    }
+}
+
+
+
+package biblioteca;
+
+import java.time.LocalDate;
+
+public class livro {
+    private String titulo;
+    private String autor;
+    private int ano;
+    private int codigo;
+    private boolean emprestado;
+    private String emprestadoPor;
+    private LocalDate dataEmprestimo;
+
+    public livro(String titulo, String autor, int ano, int codigo, boolean emprestado) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.ano = ano;
+        this.codigo = codigo;
+        this.emprestado = emprestado;
+        this.emprestadoPor = null;
+        this.dataEmprestimo = null;
+    }
+
+    public String getTitulo() { return titulo; }
+    public String getAutor() { return autor; }
+    public int getAno() { return ano; }
+    public int getCodigo() { return codigo; }
+    public boolean isEmprestado() { return emprestado; }
+    public String getEmprestadoPor() { return emprestadoPor; }
+    public LocalDate getDataEmprestimo() { return dataEmprestimo; }
+
+    public void emprestar(String leitor, LocalDate data) {
+        this.emprestado = true;
+        this.emprestadoPor = leitor;
+        this.dataEmprestimo = data;
+    }
+
+    @Override
+    public String toString() {
+        String status = emprestado ? "Emprestado (por: " + emprestadoPor + ")" : "Disponível";
+        return String.format("Código: %d | Título: %s | Autor: %s | Ano: %d | Status: %s",
+                codigo, titulo, autor, ano, status);
+    }
+}
+
