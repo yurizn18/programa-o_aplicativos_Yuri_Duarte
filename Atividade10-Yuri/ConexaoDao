@@ -1,0 +1,101 @@
+package main;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.DriverManager;
+
+public class ConexaoDao {
+
+    private Connection getConnection() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/atividade10";  //jdbc:mysql://localhost:3306/?user=root
+        String usuario = "root";
+        String senha = "root"; 
+        return DriverManager.getConnection(url, usuario, senha);
+        
+    }
+
+    // ======= CREATE =======
+    public void cadastrarAluno(Aluno aluno) {
+        String sql = "INSERT INTO aluno (nome) VALUES (?)"; 
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, aluno.getNome());
+            stmt.executeUpdate();
+            System.out.println("Aluno cadastrado com sucesso!");
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao cadastrar aluno: " + e.getMessage());
+        }
+    }
+
+    // ======= READ =======
+    public List<Aluno> listarAlunos() {
+        List<Aluno> lista = new ArrayList<>();
+        String sql = "SELECT id, nome FROM aluno";
+ System.out.println("Tentando conectar ao banco...");
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Aluno a = new Aluno();
+                a.setId(rs.getInt("id"));
+                a.setNome(rs.getString("nome"));
+                lista.add(a);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar alunos: " + e.getMessage());
+        }
+
+        return lista;
+    }
+
+    // ======= UPDATE =======
+    public void atualizarAluno(Aluno aluno) {
+        String sql = "UPDATE aluno SET nome = ? WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, aluno.getNome());
+            stmt.setInt(2, aluno.getId());
+
+            int linhas = stmt.executeUpdate();
+            if (linhas > 0) {
+                System.out.println("Aluno atualizado com sucesso!");
+            } else {
+                System.out.println("Nenhum aluno encontrado com o id informado.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar aluno: " + e.getMessage());
+        }
+    }
+
+    // ======= DELETE =======
+    public void deletarAluno(int id) {
+        String sql = "DELETE FROM aluno WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+
+            int linhas = stmt.executeUpdate();
+            if (linhas > 0) {
+                System.out.println("Aluno deletado com sucesso!");
+            } else {
+                System.out.println("Nenhum aluno encontrado com o id informado.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao deletar aluno: " + e.getMessage());
+        }
+    }
+}
