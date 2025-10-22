@@ -1,0 +1,73 @@
+package main;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {   
+    public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+        ConexaoDao cx = new ConexaoDao();
+
+        while (true) {
+            System.out.println("\n======= MENU =======");
+            System.out.println("1 - Cadastrar aluno (Create)");
+            System.out.println("2 - Listar alunos (Read)");
+            System.out.println("3 - Atualizar aluno (Update)");
+            System.out.println("4 - Deletar aluno (Delete)");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
+
+            int opcao = entrada.nextInt();
+            entrada.nextLine(); 
+
+            switch (opcao) {
+                case 1 -> {
+                    System.out.print("Digite o nome do aluno: ");
+                    String nome = entrada.nextLine();
+
+                    Aluno novo = new Aluno();
+                    novo.setNome(nome);
+                    cx.cadastrarAluno(novo);
+                }
+
+                case 2 -> {
+                    List<Aluno> alunos = cx.listarAlunos();
+                    if (alunos.isEmpty()) {
+                        System.out.println("Nenhum aluno encontrado.");
+                    } else {
+                        System.out.println("\n--- Lista de Alunos ---");
+                        for (Aluno aluno : alunos) {
+                            System.out.println(aluno); 
+                        }
+                    }
+                }
+
+                case 3 -> {
+                    System.out.print("Digite o ID do aluno a ser atualizado: ");
+                    int id = entrada.nextInt();
+                    entrada.nextLine();
+
+                    System.out.print("Digite o novo nome: ");
+                    String nome = entrada.nextLine();
+
+                    Aluno a = new Aluno(id, nome);
+                    cx.atualizarAluno(a);
+                }
+
+                case 4 -> {
+                    System.out.print("Digite o ID do aluno a ser deletado: ");
+                    int id = entrada.nextInt();
+                    cx.deletarAluno(id);
+                }
+
+                case 0 -> {
+                    System.out.println("Saindo...");
+                    entrada.close();
+                    return;
+                }
+
+                default -> System.out.println("Opção inválida! Tente novamente.");
+            }
+        }
+    }
+}
